@@ -20,7 +20,7 @@ func CopyToClipboard(text string) {
 	if err != nil {
 		fmt.Printf("Error copying to clipboard: %v\n", err)
 	} else {
-		fmt.Println("Branch name copied to clipboard!")
+		fmt.Println("copied to clipboard!")
 	}
 }
 
