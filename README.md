@@ -34,6 +34,7 @@ num_suggestions = 10 #default
 
 - `api.api_endpoint`: The OpenAI API endpoint (default: "https://api.openai.com/v1")
 - `api.api_secret`: Your OpenAI API secret key
+- `api.model`: The OpenAI model to use (default: "gpt-4o-mini")
 - `branch.pattern`: The pattern for generating branch names. Use `${date}` and `${description}` as placeholders.
 - `branch.description_format`: The format for the description part of the branch name (currently supports "kebab-case")
 - `branch.max_description_length`: Maximum length for the description part of the branch name

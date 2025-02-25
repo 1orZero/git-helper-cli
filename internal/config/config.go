@@ -16,6 +16,7 @@ type Config struct {
 type APIConfig struct {
 	APIEndpoint string `toml:"api_endpoint"`
 	APISecret   string `toml:"api_secret"`
+	Model       string `toml:"model"`
 }
 
 type BranchConfig struct {
@@ -55,6 +56,10 @@ func ValidateConfig(config *Config) error {
 	// Set default values for optional fields
 	if config.API.APIEndpoint == "" {
 		config.API.APIEndpoint = "https://api.openai.com/v1" // Set a default API endpoint
+	}
+
+	if config.API.Model == "" {
+		config.API.Model = "gpt-4o-mini" // Set a default model
 	}
 
 	if config.Branch.Pattern == "" {

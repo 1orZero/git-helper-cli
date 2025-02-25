@@ -6,10 +6,11 @@ import (
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
-func InitializeOpenAIClient(apiEndpoint, apiSecret string) llms.Model {
+func InitializeOpenAIClient(apiEndpoint, apiSecret, model string) llms.Model {
 	llm, err := openai.New(
 		openai.WithBaseURL(apiEndpoint),
 		openai.WithToken(apiSecret),
+		openai.WithModel(model),
 	)
 	if err != nil {
 		utils.HandleError("Error initializing OpenAI client", err)

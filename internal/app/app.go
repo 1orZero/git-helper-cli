@@ -24,7 +24,7 @@ func NewApp() *ucli.App {
 				return ucli.Exit("Error loading config: "+err.Error(), 1)
 			}
 			appState.Config = &cfg
-			llm := openai.InitializeOpenAIClient(cfg.API.APIEndpoint, cfg.API.APISecret)
+			llm := openai.InitializeOpenAIClient(cfg.API.APIEndpoint, cfg.API.APISecret, cfg.API.Model)
 			appState.LLM = &llm
 			return nil
 		},

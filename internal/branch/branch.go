@@ -30,7 +30,8 @@ func generateBranchNames(llm llms.Model, description string, cfg config.Config) 
 	prompt := fmt.Sprintf(`Generate %d git branch names based on this description: "%s".
 	The branch names should follow this format: %s
 	The description part should be concise and use hyphens instead of spaces.
-	Each branch name should be unique.`, cfg.Branch.NumSuggestions, description, branchPattern)
+	Each branch name should be unique.
+	IMPORTANT: Return only the branch names, one per line, without any numbering or bullet points.`, cfg.Branch.NumSuggestions, description, branchPattern)
 
 	ctx := context.Background()
 	response, err := llms.GenerateFromSinglePrompt(ctx, llm, prompt)
