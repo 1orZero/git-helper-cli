@@ -3,6 +3,8 @@ package utils
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/atotto/clipboard"
 )
@@ -26,4 +28,16 @@ func CopyToClipboard(text string) {
 
 func Log(message string) {
 	fmt.Println(message)
+}
+
+// RemoveThinkingTags removes <think>...</think> tags from the response
+func RemoveThinkingTags(response string) string {
+	// Use regex to remove thinking tags including multi-line content
+	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
+	cleanedResponse := re.ReplaceAllString(response, "")
+	
+	// Trim any extra whitespace that might be left
+	cleanedResponse = strings.TrimSpace(cleanedResponse)
+	
+	return cleanedResponse
 }

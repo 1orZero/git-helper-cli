@@ -36,10 +36,20 @@ func generateBranchNames(llm llms.Model, description string, cfg config.Config) 
 	ctx := context.Background()
 	response, err := llms.GenerateFromSinglePrompt(ctx, llm, prompt)
 	if err != nil {
+		fmt.Printf("Error generating branch names from LLM: %v\n", err)
 		return nil, err
 	}
 
-	return strings.Split(response, "\n"), nil
+	// Log the original response for debugging
+	fmt.Printf("Raw LLM response:\n%s\n", response)
+	
+	// Remove thinking tags from the response
+	cleanedResponse := utils.RemoveThinkingTags(response)
+	
+	// Log the cleaned response
+	fmt.Printf("Cleaned branch names:\n%s\n", cleanedResponse)
+
+	return strings.Split(cleanedResponse, "\n"), nil
 }
 
 func formatDescription(description, format string, maxLength int) string {

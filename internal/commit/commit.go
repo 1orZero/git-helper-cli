@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"regexp"
 	"strings"
 
 	"github.com/1orzero/git-helper-cli/internal/utils"
@@ -43,22 +42,16 @@ func GenerateCommitMessages(llm llms.Model) ([]string, error) {
 		return nil, err
 	}
 
+	// Log the original response for debugging
+	fmt.Printf("Raw LLM response:\n%s\n", response)
+	
 	// Remove thinking tags from the response
-	cleanedResponse := removeThinkingTags(response)
+	cleanedResponse := utils.RemoveThinkingTags(response)
+	
+	// Log the cleaned response
+	fmt.Printf("Cleaned commit messages:\n%s\n", cleanedResponse)
 
 	return strings.Split(cleanedResponse, "\n"), nil
-}
-
-// removeThinkingTags removes <think>...</think> tags from the response
-func removeThinkingTags(response string) string {
-	// Use regex to remove thinking tags including multi-line content
-	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
-	cleanedResponse := re.ReplaceAllString(response, "")
-
-	// Trim any extra whitespace that might be left
-	cleanedResponse = strings.TrimSpace(cleanedResponse)
-
-	return cleanedResponse
 }
 
 // getStagedChanges returns the output of git diff --cached
