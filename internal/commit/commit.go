@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/1orzero/git-helper-cli/internal/utils"
@@ -41,7 +42,23 @@ func GenerateCommitMessages(llm llms.Model) ([]string, error) {
 		fmt.Printf("Error generating commit messages from LLM: %v\n", err)
 		return nil, err
 	}
-	return (strings.Split(response, "\n")), nil
+
+	// Remove thinking tags from the response
+	cleanedResponse := removeThinkingTags(response)
+
+	return strings.Split(cleanedResponse, "\n"), nil
+}
+
+// removeThinkingTags removes <think>...</think> tags from the response
+func removeThinkingTags(response string) string {
+	// Use regex to remove thinking tags including multi-line content
+	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
+	cleanedResponse := re.ReplaceAllString(response, "")
+
+	// Trim any extra whitespace that might be left
+	cleanedResponse = strings.TrimSpace(cleanedResponse)
+
+	return cleanedResponse
 }
 
 // getStagedChanges returns the output of git diff --cached
@@ -70,43 +87,29 @@ func getRecentCommits(n int) (string, error) {
 
 // buildPrompt constructs the prompt for the LLM
 func buildPrompt(stagedChanges, recentCommits string) string {
-	return fmt.Sprintf(`
-        You are a Git commit message generator. Based on the following git diff of staged changes:
+	return fmt.Sprintf(`Generate 10 git commit messages for these staged changes:
 
-        %s
+%s
 
-        **Criteria:**
+FORMAT: <type>(<scope>): <description>
+Types: feat, fix, docs, style, refactor, test, chore, perf
+Scope: component/module name (optional)
+Description: imperative, lowercase, no period
 
-        1. **Format:** Each commit message must follow the conventional commits format,
-        which is '<type>(<scope>): <description>'.
-        2. **Relevance:** Avoid mentioning a module name unless it's directly relevant
-        to the change.
-        3. **Clarity and Conciseness:** Each message should clearly and concisely convey
-        the change made.
+EXAMPLES:
+fix(auth): validate email format before submission
+feat: add dark mode toggle to settings
+refactor(api): extract request retry logic
+test(user): cover edge cases for login flow
 
-        **Commit Message Examples:**
+RECENT COMMITS:
+%s
 
-        fix(app): add password regex pattern
-        test(unit): add new test cases
-        style: remove unused imports
-        refactor(pages): extract common code to 'utils/wait.ts'
-
-        **Recent Commits on Repo for Reference:**
-
-        %s
-
-        **Instructions:**
-
-        - Take a moment to understand the changes made in the diff.
-        - Think about the impact of these changes on the project (e.g., bug fixes, new
-        features, performance improvements, code refactoring, documentation updates).
-        - Generate 10 different commit messages that accurately describe these changes.
-        - Abstract the changes to a higher level and not just describe the code changes.
-        - Each message should be helpful to someone reading the project's history.
-
-        IMPORTANT: Return only the commit messages, one per line, without any numbering,
-        bullet points, or additional text. Do not include any explanations or markdown formatting.
-        `,
+OUTPUT RULES:
+- 10 commit messages only
+- One per line
+- No numbers, bullets, or explanations
+- Match the style of recent commits above`,
 		stagedChanges, recentCommits)
 }
 
