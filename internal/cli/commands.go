@@ -6,7 +6,6 @@ import (
 	"github.com/1orzero/git-helper-cli/internal/branch"
 	"github.com/1orzero/git-helper-cli/internal/commit"
 	"github.com/1orzero/git-helper-cli/internal/state"
-	"github.com/1orzero/git-helper-cli/internal/utils"
 	ucli "github.com/urfave/cli/v2"
 )
 
@@ -39,7 +38,7 @@ func generateBranchName(appState *state.AppState) func(c *ucli.Context) error {
 
 		// Select a branch name from the list (using fzf)
 		selectedBranch := branch.SelectBranchName(branchNames)
-		utils.CopyToClipboard(selectedBranch)
+		// utils.CopyToClipboard(selectedBranch)
 
 		Output(selectedBranch)
 		return nil
@@ -54,7 +53,7 @@ func generateCommit(appState *state.AppState) func(c *ucli.Context) error {
 		}
 
 		selectedCommit := commit.SelectCommitMessage(commitMessages)
-		utils.CopyToClipboard(selectedCommit)
+		// utils.CopyToClipboard(selectedCommit)
 
 		Output(selectedCommit)
 		return nil

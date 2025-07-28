@@ -38,9 +38,9 @@ func GenerateCommitMessages(llm llms.Model) ([]string, error) {
 	response, err := llms.GenerateFromSinglePrompt(ctx, llm, prompt)
 
 	if err != nil {
+		fmt.Printf("Error generating commit messages from LLM: %v\n", err)
 		return nil, err
 	}
-
 	return (strings.Split(response, "\n")), nil
 }
 
