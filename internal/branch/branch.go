@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -37,18 +38,12 @@ func generateBranchNames(llm llms.Model, description string, cfg config.Config) 
 	ctx := context.Background()
 	response, err := llms.GenerateFromSinglePrompt(ctx, llm, prompt)
 	if err != nil {
-		fmt.Printf("Error generating branch names from LLM: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error generating branch names from LLM: %v\n", err)
 		return nil, err
 	}
 
-	// Log the original response for debugging
-	fmt.Printf("Raw LLM response:\n%s\n", response)
-	
 	// Remove thinking tags from the response
 	cleanedResponse := utils.RemoveThinkingTags(response)
-	
-	// Log the cleaned response
-	fmt.Printf("Cleaned branch names:\n%s\n", cleanedResponse)
 
 	return strings.Split(cleanedResponse, "\n"), nil
 }
@@ -109,7 +104,6 @@ func SelectBranchName(branchNames []string) (string, error) {
 
 	if len(idx) > 0 {
 		selectedBranch := branchNames[idx[0]]
-		fmt.Printf("Selected branch name: %s\n", selectedBranch)
 		return selectedBranch, nil
 	}
 	return "", nil
