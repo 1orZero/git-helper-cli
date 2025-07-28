@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -39,18 +40,12 @@ func GenerateCommitMessages(llm llms.Model) ([]string, error) {
 	response, err := llms.GenerateFromSinglePrompt(ctx, llm, prompt)
 
 	if err != nil {
-		fmt.Printf("Error generating commit messages from LLM: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error generating commit messages from LLM: %v\n", err)
 		return nil, err
 	}
 
-	// Log the original response for debugging
-	fmt.Printf("Raw LLM response:\n%s\n", response)
-	
 	// Remove thinking tags from the response
 	cleanedResponse := utils.RemoveThinkingTags(response)
-	
-	// Log the cleaned response
-	fmt.Printf("Cleaned commit messages:\n%s\n", cleanedResponse)
 
 	return strings.Split(cleanedResponse, "\n"), nil
 }
@@ -132,7 +127,6 @@ func SelectCommitMessage(commitMessages []string) (string, error) {
 
 	if len(idx) > 0 {
 		selectedCommit := commitMessages[idx[0]]
-		fmt.Printf("Selected commit message: %s\n", selectedCommit)
 		return selectedCommit, nil
 	}
 	return "", nil
