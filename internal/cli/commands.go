@@ -37,7 +37,16 @@ func generateBranchName(appState *state.AppState) func(c *ucli.Context) error {
 		branchNames := branch.GenerateAndCleanBranchNames(*appState.LLM, description, *appState.Config)
 
 		// Select a branch name from the list (using fzf)
-		selectedBranch := branch.SelectBranchName(branchNames)
+		selectedBranch, err := branch.SelectBranchName(branchNames)
+		if err != nil {
+			return ucli.Exit("Error selecting branch name: "+err.Error(), 1)
+		}
+		
+		// Check if user cancelled selection (ESC) or no selection was made
+		if selectedBranch == "" {
+			return ucli.Exit("No branch name selected", 1)
+		}
+		
 		// utils.CopyToClipboard(selectedBranch)
 
 		Output(selectedBranch)
@@ -52,7 +61,16 @@ func generateCommit(appState *state.AppState) func(c *ucli.Context) error {
 			return ucli.Exit("Error generating commit messages: "+err.Error(), 1)
 		}
 
-		selectedCommit := commit.SelectCommitMessage(commitMessages)
+		selectedCommit, err := commit.SelectCommitMessage(commitMessages)
+		if err != nil {
+			return ucli.Exit("Error selecting commit message: "+err.Error(), 1)
+		}
+		
+		// Check if user cancelled selection (ESC) or no selection was made
+		if selectedCommit == "" {
+			return ucli.Exit("No commit message selected", 1)
+		}
+		
 		// utils.CopyToClipboard(selectedCommit)
 
 		Output(selectedCommit)

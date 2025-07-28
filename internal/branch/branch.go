@@ -2,6 +2,7 @@ package branch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -89,24 +90,27 @@ func cleanBranchNames(branchNames []string) []string {
 	return cleanedNames
 }
 
-func SelectBranchName(branchNames []string) string {
+func SelectBranchName(branchNames []string) (string, error) {
 	f, err := fzf.New(fzf.WithPrompt("Select a branch name: "))
 	if err != nil {
-		utils.HandleError("Error initializing fzf", err)
+		return "", fmt.Errorf("error initializing fzf: %w", err)
 	}
 
 	idx, err := f.Find(branchNames, func(i int) string {
 		return branchNames[i]
 	})
 	if err != nil {
-		utils.HandleError("Error during selection", err)
+		// Check if user cancelled selection (pressed ESC)
+		if errors.Is(err, fzf.ErrAbort) {
+			return "", nil
+		}
+		return "", fmt.Errorf("error during selection: %w", err)
 	}
 
 	if len(idx) > 0 {
 		selectedBranch := branchNames[idx[0]]
 		fmt.Printf("Selected branch name: %s\n", selectedBranch)
-		return selectedBranch
+		return selectedBranch, nil
 	}
-	fmt.Println("No branch name selected")
-	return ""
+	return "", nil
 }

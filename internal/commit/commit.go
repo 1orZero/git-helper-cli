@@ -3,6 +3,7 @@ package commit
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -112,24 +113,27 @@ func extractCommitMessages(response string) string {
 	return response
 }
 
-func SelectCommitMessage(commitMessages []string) string {
+func SelectCommitMessage(commitMessages []string) (string, error) {
 	f, err := fzf.New(fzf.WithPrompt("Select a commit message: "))
 	if err != nil {
-		utils.HandleError("Error initializing fzf", err)
+		return "", fmt.Errorf("error initializing fzf: %w", err)
 	}
 
 	idx, err := f.Find(commitMessages, func(i int) string {
 		return commitMessages[i]
 	})
 	if err != nil {
-		utils.HandleError("Error during selection", err)
+		// Check if user cancelled selection (pressed ESC)
+		if errors.Is(err, fzf.ErrAbort) {
+			return "", nil
+		}
+		return "", fmt.Errorf("error during selection: %w", err)
 	}
 
 	if len(idx) > 0 {
 		selectedCommit := commitMessages[idx[0]]
 		fmt.Printf("Selected commit message: %s\n", selectedCommit)
-		return selectedCommit
+		return selectedCommit, nil
 	}
-	fmt.Println("No commit message selected")
-	return ""
+	return "", nil
 }

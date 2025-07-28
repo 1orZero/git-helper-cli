@@ -10,7 +10,7 @@ import (
 )
 
 func HandleError(message string, err error) {
-	fmt.Printf("%s: %v\n", message, err)
+	fmt.Fprintf(os.Stderr, "%s: %v\n", message, err)
 	os.Exit(1)
 }
 
